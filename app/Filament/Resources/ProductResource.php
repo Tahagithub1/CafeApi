@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CategoryResource\Pages;
-use App\Filament\Resources\CategoryResource\RelationManagers;
+use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Category;
+use App\Models\Product;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -15,11 +16,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
-class CategoryResource extends Resource
-{
-    protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-folder-open';
+class ProductResource extends Resource
+{
+    protected static ?string $model = Product::class;
+
+    protected static ?string $navigationIcon = 'heroicon-c-shopping-bag';
 
     protected static ?string $navigationGroup = "Menu";
 
@@ -27,7 +29,16 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->required()->maxLength('20')->columnSpanFull(),
+                Forms\Components\TextInput::make('title')->required()->minLength('5')->maxLength('15'),
+                Forms\Components\TextInput::make('description')->required()->minLength('10')->maxLength('100'),
+                Forms\Components\TextInput::make('price')->required(),
+                Forms\Components\Select::make('category_id')
+                    ->required()
+                    ->label('CategoryName')
+                    ->options(Category::all()->pluck('name' , 'id')),
+//                    ->default('name')
+//                    ->native(false),
+
                 Forms\Components\FileUpload::make('photo')->columnSpanFull()
                     ->preserveFilenames()
                     ->getUploadedFileNameForStorageUsing(
@@ -36,7 +47,7 @@ class CategoryResource extends Resource
                             $file->getClientOriginalExtension()
 //                                            ->prepend('custom-prefix-'),
                     )->required()->rule([
-                       'dimensions:min_width=4000,min_height:4000'
+                        'dimensions:min_width=100,min_height:100'
                     ]),
 
             ]);
@@ -46,13 +57,11 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->label('number')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                    Tables\Columns\ImageColumn::make('photo')->circular(),
+                Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('description')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('price')->searchable()->sortable()->numeric(),
+                Tables\Columns\ImageColumn::make('photo')->searchable()->sortable()->circular(),
+
             ])
             ->filters([
                 //
@@ -78,9 +87,9 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'index' => Pages\ListProducts::route('/'),
+            'create' => Pages\CreateProduct::route('/create'),
+            'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
 }
