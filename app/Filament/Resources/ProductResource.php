@@ -38,12 +38,11 @@ class ProductResource extends Resource
                     ->options(Category::all()->pluck('name' , 'id')),
 //                    ->default('name')
 //                    ->native(false),
-
                 Forms\Components\FileUpload::make('photo')->columnSpanFull()
                     ->preserveFilenames()
                     ->getUploadedFileNameForStorageUsing(
                         fn (TemporaryUploadedFile $file , Forms\Get $get): string => (string)
-                            $get('name') . "-" . Carbon::now()->format('Y-m-d') .".".
+                            $get('title') . "-" . Carbon::now()->format('Y-m-d') .".".
                             $file->getClientOriginalExtension()
 //                                            ->prepend('custom-prefix-'),
                     )->required()->rule([
