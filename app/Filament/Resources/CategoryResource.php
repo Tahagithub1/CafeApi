@@ -52,7 +52,7 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                    Tables\Columns\ImageColumn::make('photo')->circular(),
+                    Tables\Columns\ImageColumn::make('image')->circular(),
             ])
             ->filters([
                 //
