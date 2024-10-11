@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Category;
 use App\Http\Controllers\CategoryConrtoller;
 use \App\Http\Controllers\ProductController;
+use \App\Http\Controllers\CartContoller;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,10 +23,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('/categories')->group(function (){
+    Route::get('/', [CategoryConrtoller::class , 'index']);
+    Route::get('/{id}', [CategoryConrtoller::class , 'show']);
     Route::post('/', [CategoryConrtoller::class , 'store']);
     Route::delete('/{id}', [CategoryConrtoller::class , 'destroy']);
-    Route::get('/{id}', [CategoryConrtoller::class , 'show']);
-    Route::get('/', [CategoryConrtoller::class , 'index']);
 });
 
 Route::prefix('products')->group(function (){
@@ -33,5 +34,11 @@ Route::prefix('products')->group(function (){
     Route::get('/{id}' , [ProductController::class , 'show']);
     Route::post('/' , [ProductController::class , 'store']);
     Route::delete('/{id}' , [ProductController::class , 'destroy']);
+});
+
+Route::prefix('carts')->group(function (){
+    Route::post('/' , [CartContoller::class , 'createCart']);
+    Route::post('/{cart}/items' , [CartContoller::class , 'addItem']);
+    Route::get('{cart}' , [CartContoller::class , 'viewCart']);
 });
 
