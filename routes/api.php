@@ -40,5 +40,8 @@ Route::prefix('carts')->group(function (){
     Route::post('/' , [CartContoller::class , 'createCart']);
     Route::post('/{cart}/items' , [CartContoller::class , 'addItem']);
     Route::get('{cart}' , [CartContoller::class , 'viewCart']);
+    Route::post('{cart}/items/{item}/increase' , [CartContoller::class , 'increaseItemQuantity']);
+    Route::post('{cart}/items/{item}/decrease' , [CartContoller::class , 'decreaseItemQuantity']);
+
 });
 
