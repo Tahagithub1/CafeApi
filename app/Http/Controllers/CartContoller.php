@@ -24,12 +24,23 @@ class CartContoller extends Controller
           'product_id' => 'required|exists:products,id',
           'quantity' => 'required|integer|min:1'
        ]);
-       $cart_item = CartItem::create([
-           'cart_id' => $cart_id,
-           'product_id' => $request->product_id,
-           'quantity' => $request->quantity,
-       ]);
-       return response()->json([$cart_item]);
+       $cartItem = CartItem::where('product_id',$request->product_id)->first();
+       if($cart_id){
+           $cartItem->quantity += $request->quantity;
+           $cartItem->save();
+       }else{
+           $cartItem = CartItem::create([
+               'product_id' => $request->pruduct_id ,
+               'quantity' => $request->quantity,
+           ]);
+       }
+       return response()->json(['message'=>'Item Added To Cart Successfully' , 'item' =>$cartItem]);
+//       $cart_item = CartItem::create([
+//           'cart_id' => $cart_id,
+//           'product_id' => $request->product_id,
+//           'quantity' => $request->quantity,
+//       ]);
+//       return response()->json([$cart_item]);
     }
 
     public function viewCart($cart_id){
@@ -38,4 +49,22 @@ class CartContoller extends Controller
         return response()->json($cart);
 
     }
-}
+
+    public function increaseItemQuantity(Request $request , $cartId , $itemId){
+        $cartItem = CartItem::where('cart_id' , $cartId)->where('id',$itemId)->firstOrFail();
+        $cartItem->increment('quantity',$request->quantity);
+        return response()->json($cartItem);
+    }
+
+    public function decreaseItemQuantity(Request $request , $cartId , $itemId){
+        $cartItem = CartItem::where('cart_id' , $cartId)->where('id',$itemId)->firstOrFail();
+
+            if ($cartItem->quantity > $request->quantity){
+                $cartItem->decrement('quantity',$request->quantity);
+            }else{
+                $cartItem->delete();
+            }
+            return response()->json($cartItem);
+        }
+
+    }
