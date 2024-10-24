@@ -3,9 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Category;
-use App\Http\Controllers\CategoryConrtoller;
-use \App\Http\Controllers\ProductController;
-use \App\Http\Controllers\CartContoller;
+use App\Http\Controllers\CategoryController;  // Fixed typo: Conrtoller -> Controller
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;      // Fixed typo: Contoller -> Controller
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,25 +24,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('/categories')->group(function (){
-    Route::get('/', [CategoryConrtoller::class , 'index']);
-    Route::get('/{id}', [CategoryConrtoller::class , 'show']);
-    Route::post('/', [CategoryConrtoller::class , 'store']);
-    Route::delete('/{id}', [CategoryConrtoller::class , 'destroy']);
+    Route::get('/', [CategoryController::class, 'index']);          // Fixed class name
+    Route::get('/{id}', [CategoryController::class, 'show']);       // Fixed class name
+    Route::post('/', [CategoryController::class, 'store']);         // Fixed class name
+    Route::delete('/{id}', [CategoryController::class, 'destroy']); // Fixed class name
 });
 
 Route::prefix('products')->group(function (){
-    Route::get('/' , [ProductController::class , 'index']);
-    Route::get('/{id}' , [ProductController::class , 'show']);
-    Route::post('/' , [ProductController::class , 'store']);
-    Route::delete('/{id}' , [ProductController::class , 'destroy']);
+    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/{id}', [ProductController::class, 'show']);
+    Route::post('/', [ProductController::class, 'store']);
+    Route::delete('/{id}', [ProductController::class, 'destroy']);
 });
 
 Route::prefix('carts')->group(function (){
-    Route::post('/' , [CartContoller::class , 'createCart']);
-    Route::post('/{cart}/items' , [CartContoller::class , 'addItem']);
-    Route::get('{cart}' , [CartContoller::class , 'viewCart']);
-    Route::post('{cart}/items/{item}/increase' , [CartContoller::class , 'increaseItemQuantity']);
-    Route::post('{cart}/items/{item}/decrease' , [CartContoller::class , 'decreaseItemQuantity']);
-
+    Route::post('/', [CartController::class, 'createCart']);        // Fixed class name
+    Route::post('/{cart}/items', [CartController::class, 'addItem']);
+    Route::get('{cart}', [CartController::class, 'viewCart']);
+    Route::post('{cart}/items/{item}/increase', [CartController::class, 'increaseItemQuantity']);
+    Route::post('{cart}/items/{item}/decrease', [CartController::class, 'decreaseItemQuantity']);
 });
 
