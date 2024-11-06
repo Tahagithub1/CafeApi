@@ -38,7 +38,7 @@ class ProductResource extends Resource
                     ->options(Category::all()->pluck('name' , 'id')),
 //                    ->default('name')
 //                    ->native(false),
-                Forms\Components\FileUpload::make('photo')->columnSpanFull()
+                Forms\Components\FileUpload::make('image')->columnSpanFull()
                     ->preserveFilenames()
                     ->getUploadedFileNameForStorageUsing(
                         fn (TemporaryUploadedFile $file , Forms\Get $get): string => (string)
@@ -46,7 +46,7 @@ class ProductResource extends Resource
                             $file->getClientOriginalExtension()
 //                                            ->prepend('custom-prefix-'),
                     )->required()->rule([
-                        'dimensions:min_width=100,min_height:100'
+                        // 'dimensions:min_width=100,min_height:100'
                     ]),
 
             ]);
@@ -59,7 +59,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('description')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('price')->searchable()->sortable()->numeric(),
-                Tables\Columns\ImageColumn::make('photo')->searchable()->sortable()->circular(),
+                Tables\Columns\ImageColumn::make('image')->searchable()->sortable()->circular(),
 
             ])
             ->filters([
