@@ -16,7 +16,11 @@ class CartContoller extends Controller
                    'table_number' => $request->input('table_number')
            ]);
 
-                 return response()->json($cart);
+                 return response()->json([
+                    'success' => true,
+                    'message' => 'table_number Created Successfully',
+                    'cart' => $cart
+                 ],201);
      }
 
     public function addItem(Request $request , $cart_id){
@@ -34,7 +38,10 @@ class CartContoller extends Controller
                'quantity' => $request->quantity,
            ]);
        }
-       return response()->json(['message'=>'Item Added To Cart Successfully' , 'item' =>$cartItem]);
+       return response()->json([
+        'message'=>'Item Added To Cart Successfully' ,
+         'item' =>$cartItem
+        ],201);
 //       $cart_item = CartItem::create([
 //           'cart_id' => $cart_id,
 //           'product_id' => $request->product_id,
@@ -46,14 +53,22 @@ class CartContoller extends Controller
     public function viewCart($cart_id){
 
         $cart = Cart::with('items.product')->findOrFail($cart_id);
-        return response()->json($cart);
+        return response()->json([
+            'success' => true ,
+            'message' => 'view cart',
+            'cartItem' => $cartItem
+        ],200);
 
     }
 
     public function increaseItemQuantity(Request $request , $cartId , $itemId){
         $cartItem = CartItem::where('cart_id' , $cartId)->where('id',$itemId)->firstOrFail();
         $cartItem->increment('quantity',$request->quantity);
-        return response()->json($cartItem);
+        return response()->json([
+            'success' => true ,
+            'message' => 'he number of items increase',
+            'cartItem' => $cartItem
+        ],201);
     }
 
     public function decreaseItemQuantity(Request $request , $cartId , $itemId){
@@ -64,7 +79,11 @@ class CartContoller extends Controller
             }else{
                 $cartItem->delete();
             }
-            return response()->json($cartItem);
+            return response()->json([
+                'success' => true ,
+                'message' => 'he number of items decreased',
+                'cartItem' => $cartItem
+            ],200);
         }
 
     }
