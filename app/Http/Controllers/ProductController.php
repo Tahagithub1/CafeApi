@@ -34,14 +34,14 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:22|unique:categories,name',
+            'title' => 'required|string|max:25|unique:categories,name',
             'image' => 'required|nullable|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
             'category_id' => 'required|exists:categories,id'],
             [
                 'category_id.exists' => 'The Selected Category is Invalid , Please Choose a Valid Category'
             ],
             [
-            'description' => 'string|required',
+            'description' => 'string|required|max:255',
             'price' => 'required|numeric|min:0',
         ]);
 

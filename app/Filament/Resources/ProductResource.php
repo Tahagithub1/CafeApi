@@ -30,7 +30,7 @@ class ProductResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('title')->required()->minLength('5')->maxLength('15'),
-                Forms\Components\TextInput::make('description')->required()->minLength('10')->maxLength('100'),
+                Forms\Components\TextInput::make('description')->required()->minLength('10')->maxLength('255'),
                 Forms\Components\TextInput::make('price')->required(),
                 Forms\Components\Select::make('category_id')
                     ->required()
