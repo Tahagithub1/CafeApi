@@ -1,47 +1,32 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Models\Category;
-use App\Http\Controllers\CategoryConrtoller;
-use \App\Http\Controllers\ProductController;
-use \App\Http\Controllers\CartContoller;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('/categories')->group(function () {
+    Route::get('/', [CategoryController::class, 'index']);          
+    Route::get('/{id}', [CategoryController::class, 'show']);       
+    Route::post('/', [CategoryController::class, 'store']);         
+    Route::delete('/{id}', [CategoryController::class, 'destroy']);
 });
 
-Route::prefix('/categories')->group(function (){
-    Route::get('/', [CategoryConrtoller::class , 'index']);
-    Route::get('/{id}', [CategoryConrtoller::class , 'show']);
-    Route::post('/', [CategoryConrtoller::class , 'store']);
-    Route::delete('/{id}', [CategoryConrtoller::class , 'destroy']);
+Route::prefix('/products')->group(function () {
+    // Move search route BEFORE the {id} route to prevent conflict
+    Route::get('/search', [ProductController::class, 'search']);    
+    Route::get('/', [ProductController::class, 'index']);           
+    Route::post('/', [ProductController::class, 'store']);          
+    Route::get('/{id}', [ProductController::class, 'show']);        
+    Route::delete('/{id}', [ProductController::class, 'destroy']);  
 });
 
-Route::prefix('products')->group(function (){
-    Route::get('/' , [ProductController::class , 'index']);
-    Route::get('/{id}' , [ProductController::class , 'show']);
-    Route::post('/' , [ProductController::class , 'store']);
-    Route::delete('/{id}' , [ProductController::class , 'destroy']);
+
+Route::prefix('/carts')->group(function () {
+    Route::post('/', [CartController::class, 'createCart']);                
+    Route::post('/{cart}/items', [CartController::class, 'addItem']);        
+    Route::get('/{cart}', [CartController::class, 'viewCart']);             
+    Route::post('/{cart}/items/{item}/increase', [CartController::class, 'increaseItemQuantity']); 
+    Route::post('/{cart}/items/{item}/decrease', [CartController::class, 'decreaseItemQuantity']);
+    Route::delete('/{cart}/items/{item}', [CartController::class, 'removeItem']);
+ 
 });
-
-Route::prefix('carts')->group(function (){
-    Route::post('/' , [CartContoller::class , 'createCart']);
-    Route::post('/{cart}/items' , [CartContoller::class , 'addItem']);
-    Route::get('{cart}' , [CartContoller::class , 'viewCart']);
-    Route::post('{cart}/items/{item}/increase' , [CartContoller::class , 'increaseItemQuantity']);
-    Route::post('{cart}/items/{item}/decrease' , [CartContoller::class , 'decreaseItemQuantity']);
-
-});
-

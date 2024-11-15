@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 
-class CategoryConrtoller extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
