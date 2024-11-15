@@ -39,6 +39,35 @@ class CartController extends Controller
             ], 500);
         }
     }
+
+    public function search(Request $request)
+    {
+        
+        $query = $request->input('query');
+    
+        if (empty($query)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Search query cannot be empty',
+            ], 400);   
+        }
+    
+        $products = Product::where('name', 'like', "%$query%")
+            ->orWhere('description', 'like', "%$query%")
+            ->get();
+    
+        if ($products->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No products found for the given search query.',
+            ], 404);
+        }
+    
+        return response()->json([
+            'success' => true,
+            'products' => $products,
+        ], 200);
+    }
     
     public function addItem(Request $request, $cart_id)
     {
@@ -127,34 +156,7 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function search(Request $request)
-{
-    
-    $query = $request->input('query');
 
-    if (empty($query)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Search query cannot be empty',
-        ], 400);   
-    }
-
-    $products = Product::where('name', 'like', "%$query%")
-        ->orWhere('description', 'like', "%$query%")
-        ->get();
-
-    if ($products->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No products found for the given search query.',
-        ], 404);
-    }
-
-    return response()->json([
-        'success' => true,
-        'products' => $products,
-    ], 200);
-}
 
 public function removeItem($cartId, $itemId)
 {
