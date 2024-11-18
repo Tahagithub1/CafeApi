@@ -29,8 +29,8 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')->required()->minLength('5')->maxLength('15'),
-                Forms\Components\TextInput::make('description')->required()->minLength('10')->maxLength('100'),
+                Forms\Components\TextInput::make('title')->required()->minLength('4')->maxLength('45'),
+                Forms\Components\TextInput::make('description')->required()->minLength('10')->maxLength('225'),
                 Forms\Components\TextInput::make('price')->required(),
                 Forms\Components\Select::make('category_id')
                     ->required()
@@ -38,7 +38,7 @@ class ProductResource extends Resource
                     ->options(Category::all()->pluck('name' , 'id')),
 //                    ->default('name')
 //                    ->native(false),
-                Forms\Components\FileUpload::make('photo')->columnSpanFull()
+                Forms\Components\FileUpload::make('image')->columnSpanFull()
                     ->preserveFilenames()
                     ->getUploadedFileNameForStorageUsing(
                         fn (TemporaryUploadedFile $file , Forms\Get $get): string => (string)
@@ -59,7 +59,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('description')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('price')->searchable()->sortable()->numeric(),
-                Tables\Columns\ImageColumn::make('photo')->searchable()->sortable()->circular(),
+                Tables\Columns\ImageColumn::make('image')->searchable()->sortable()->circular(),
 
             ])
             ->filters([

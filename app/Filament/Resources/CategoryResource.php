@@ -28,16 +28,6 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')->required()->maxLength('20')->columnSpanFull(),
-                Forms\Components\FileUpload::make('photo')->columnSpanFull()
-                    ->preserveFilenames()
-                    ->getUploadedFileNameForStorageUsing(
-                        fn (TemporaryUploadedFile $file , Forms\Get $get): string => (string)
-                            $get('name') . "-" . Carbon::now()->format('Y-m-d') .".".
-                            $file->getClientOriginalExtension()
-//                                            ->prepend('custom-prefix-'),
-                    )->required()->rule([
-                       'dimensions:min_width=4000,min_height:4000'
-                    ]),
 
             ]);
     }
@@ -52,7 +42,6 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                    Tables\Columns\ImageColumn::make('image')->circular(),
             ])
             ->filters([
                 //
