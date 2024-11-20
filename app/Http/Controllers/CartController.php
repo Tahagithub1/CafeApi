@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CartItem;
 use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -154,6 +155,22 @@ class CartController extends Controller
             'message' => 'The number of items decreased',
             'cartItem' => $cartItem
         ], 200);
+    }
+    public function completeorders(Request $request){
+        $validat = $request->validate([
+            'table_number' => 'required|exists:carts,table_number'
+        ]);
+        $Cart = Cart::where('table_number',$validat('table_number'))->where('status',false)->first();
+        if(!$Cart)){
+            return response()->json([ 
+                'success'=> false,
+                'message'=> 'Cart not found or already compleed'
+            ]);
+            $Cart->update('status' => true);
+            return response()->json([ 
+                'success'=> true,   
+                'message'=> 'order completed successfully'
+              ]);
     }
 
 
