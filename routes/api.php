@@ -28,5 +28,6 @@ Route::prefix('/carts')->group(function () {
     Route::post('/{cart}/items/{item}/increase', [CartController::class, 'increaseItemQuantity']); 
     Route::post('/{cart}/items/{item}/decrease', [CartController::class, 'decreaseItemQuantity']);
     Route::delete('/{cart}/items/{item}', [CartController::class, 'removeItem']);
+    Route::post('/complete-order', [CartController::class,'completeorders'])->name('cart.completeorders');
  
 });

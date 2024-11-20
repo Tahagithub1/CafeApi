@@ -7,7 +7,8 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Foundation\Console\StorageLinkCommand;
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -18,12 +19,10 @@ class CartController extends Controller
         try {
             $request->validate([
                 'table_number' => 'required|numeric|min:1',
-                'status' => 'required|in:active,completed'
             ]);
     
             $cart = Cart::create([
                 'table_number' => $request->input('table_number'),
-                'status' => $request->input('status')
             ]);
     
             return response()->json([
@@ -160,18 +159,27 @@ class CartController extends Controller
         $validat = $request->validate([
             'table_number' => 'required|exists:carts,table_number'
         ]);
-        $Cart = Cart::where('table_number',$validat('table_number'))->where('status',false)->first();
-        if(!$Cart)){
-            return response()->json([ 
-                'success'=> false,
-                'message'=> 'Cart not found or already compleed'
-            ]);
-            $Cart->update('status' => true);
+        $Cart = Cart::where('table_number',$validat['table_number'])->where('status',0)->first();
+        if($Cart){
+            // $Cart->update(['status' => 1]);
+            // $Cart->refresh();
+            // dd($Cart);
+            DB::connection()->getPdo();
+            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validat['table_number']]);
             return response()->json([ 
                 'success'=> true,   
                 'message'=> 'order completed successfully'
-              ]);
-    }
+              ],201);
+        }else{
+            return response()->json([ 
+                'success'=> false,
+                'message'=> 'Cart not found or already compleed'
+            ],404);
+        }
+           
+            }
+    
+
 
 
 
