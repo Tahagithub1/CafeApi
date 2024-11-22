@@ -18,7 +18,7 @@ class CustomPage extends Page
     public $carts;
          public function mount(){
             $this->carts = Cart::with('items.product')->get();
-        
+
          }
-     } 
+     }
 
