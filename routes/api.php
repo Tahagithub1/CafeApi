@@ -3,6 +3,8 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ResetController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('/categories')->group(function () {
     Route::get('/', [CategoryController::class, 'index']);
@@ -30,5 +32,8 @@ Route::prefix('/carts')->group(function () {
     Route::delete('/{cart}/items/{item}', [CartController::class, 'removeItem']);
     Route::post('/complete-order', [CartController::class,'completeorders'])->name('cart.completeorders');
     Route::get('/{cart}/viewcartorder' , [CartController::class,'viewcartorder'])->name('cart.viewcartorder');
+    Route::delete('/{id}/reset_storage', [ResetController::class, 'Delete']);
 
 });
+
+
