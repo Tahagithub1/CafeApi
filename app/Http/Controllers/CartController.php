@@ -193,26 +193,36 @@ class CartController extends Controller
         ], 200);
     }
     public function completeorders(Request $request){
-        $validat = $request->validate([
-            'table_number' => 'required|exists:carts,table_number'
+        $validated = $request->validate([
+            'table_number' => 'required|exists:carts,table_number',
         ]);
-        $Cart = Cart::where('table_number',$validat['table_number'])->where('status',0)->first();
-        if($Cart){
-            // $Cart->update(['status' => 1]);
-            // $Cart->refresh();
-            // dd($Cart);
-            DB::connection()->getPdo();
-            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validat['table_number']]);
+        $cart = Cart::where('table_number', $validated['table_number'])->where('status', 0)->first();
+        if (!$cart) {
             return response()->json([
-                'success'=> true,
-                'message'=> 'order completed successfully'
-              ],201);
-        }else{
-            return response()->json([
-                'success'=> false,
-                'message'=> 'Cart not found or already compleed'
-            ],404);
+                'message' => 'Cart not found or already completed'
+            ], 404);
         }
+        $cart->status = 1;
+        $cart->save();
+        return response()->json([
+            'message' => 'Order completed successfully!'
+        ]);
+//        if($Cart){
+//            // $Cart->update(['status' => 1]);
+//            // $Cart->refresh();
+//            // dd($Cart);
+//            DB::connection()->getPdo();
+//            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validat['table_number']]);
+//            return response()->json([
+//                'success'=> true,
+//                'message'=> 'order completed successfully'
+//              ],201);
+//        }else{
+//            return response()->json([
+//                'success'=> false,
+//                'message'=> 'Cart not found or already compleed'
+//            ],404);
+//        }
 
             }
 

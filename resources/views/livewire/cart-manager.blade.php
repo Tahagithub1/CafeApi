@@ -1,4 +1,4 @@
-<link href="{{ asset('css/output.css') }}" rel="stylesheet">
+{{--<link href="{{ asset('css/output.css') }}" rel="stylesheet">--}}
     <div class="p-6 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Orders List</h2>
 

@@ -46,8 +46,8 @@ class ProductController extends Controller
         ]);
 
         $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
+        if ($request->hasFile('images')) {
+            $imagePath = $request->file('images')->store('products', 'public');
         }
 
         if ($validator->fails()) {
