@@ -32,7 +32,7 @@ Route::prefix('/carts')->group(function () {
     Route::delete('/{cart}/items/{item}', [CartController::class, 'removeItem']);
     Route::post('/complete-order', [CartController::class,'completeorders'])->name('cart.completeorders');
     Route::get('/{cart}/viewcartorder' , [CartController::class,'viewcartorder'])->name('cart.viewcartorder');
-    Route::delete('/{id}/reset_storage', [ResetController::class, 'Delete']);
+//    Route::delete('/{id}/reset_storage', [ResetController::class, 'Delete']);
 
 });
 

@@ -8,10 +8,10 @@ class ResetController extends Controller
 {
     public function Delete($id)
     {
-        $Cart = \App\Models\Cart::find($id);
-        if ($Cart) {
-            $Cart->delete();
-            event(new ResetLocalStorage());
-        }
+//        $Cart = \App\Models\Cart::find($id);
+//        if ($Cart) {
+//            $Cart->delete();
+//            event(new ResetLocalStorage());
+//        }
     }
 }
