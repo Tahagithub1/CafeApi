@@ -243,17 +243,19 @@ class CartController extends Controller
         $cart = Cart::where('table_number', $validated['table_number'])
             ->where('status', 0)
             ->first();
+        if ($cart){
+            DB::update('update carts set status = 1 where table_number = ?', [$validated['table_number']]);
+        }
 
         if (!$cart) {
             return response()->json(['message' => 'Cart not found or already completed'], 404);
         }
 
-        DB::update('update carts set status = 1 where table_number = ?', [$validated['table_number']]);
 
         return response()->json([
             'success' => true,
             'message' => 'Order completed successfully!',
-            'cart' => $cart,
+//            'cart' => $cart,
         ], 201);
     }
 
