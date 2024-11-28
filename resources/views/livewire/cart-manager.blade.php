@@ -4,17 +4,14 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($carts as $cart)
+                @if($cart->status == 1)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow duration-300">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
                             Table Number: {{ $cart->table_number }}
                         </h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                            @if($cart->status == 0)
-                                Status: <span class="text-yellow-500 font-semibold">Pending</span>
-                            @elseif($cart->status == 1)
                                 Status: <span class="text-green-500 font-semibold">Completed</span>
-                            @endif
                         </p>
                         <button
                             wire:click="removeCart({{ $cart->id }})"
@@ -51,6 +48,7 @@
                         @endforeach
                     </ul>
                 </div>
+                @endif
             @endforeach
         </div>
     </div>
