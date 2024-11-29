@@ -17,14 +17,17 @@ class CartManager extends Component
     public function removeCart($cartId)
     {
         Cart::find($cartId)->delete();
-        $this->emit('cartRemoved', $cartId);
+        $table_number = $cartId;
+        $this->dispatch('cart-removed', ['table_number' => $table_number]);
         $this->carts = Cart::with('items.product')->get();
-    }
+
+        }
+
+
 
     public function removeItem($itemId)
     {
         CartItem::find($itemId)->delete();
-        $this->emit('itemRemoved', $itemId);
         $this->carts = Cart::with('items.product')->get();
     }
 
