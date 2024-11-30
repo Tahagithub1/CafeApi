@@ -231,9 +231,6 @@ class CartController extends Controller
 
 //    }
 
-
-
-
     public function completeorders(Request $request)
     {
         $validated = $request->validate([
@@ -258,6 +255,37 @@ class CartController extends Controller
 //            'cart' => $cart,
         ], 201);
     }
+    public function get_status($table_number){
+        $cart = Cart::where('table_number', $table_number)->with('items.product')->first();
+        if ($cart) {
+            return response()->json([
+                'success' => true,
+                'status' => $cart->status,
+                'order' => $cart,
+                ],200);
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found for this table_number.'
+        ],404);
+    }
+}
+public function clearcart($table_number){
+        $cart = Cart::where('table_number', $table_number)->first();
+        if ($cart) {
+            $cart->items()->delete();
+            $cart->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart has been cleared successfully!',
+            ],200);
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found for this table_number.'
+            ],404);
+        }
+}
 
 
 public function removeItem($cartId, $itemId)

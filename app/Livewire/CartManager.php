@@ -20,10 +20,7 @@ class CartManager extends Component
         $table_number = $cartId;
         $this->dispatch('cart-removed', ['table_number' => $table_number]);
         $this->carts = Cart::with('items.product')->get();
-
-        }
-
-
+    }
 
     public function removeItem($itemId)
     {

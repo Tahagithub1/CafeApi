@@ -33,6 +33,8 @@ Route::prefix('/carts')->group(function () {
     Route::post('/complete-order', [CartController::class,'completeorders'])->name('cart.completeorders');
     Route::get('/{cart}/viewcartorder' , [CartController::class,'viewcartorder'])->name('cart.viewcartorder');
 //    Route::delete('/{id}/reset_storage', [ResetController::class, 'Delete']);
+    Route::get('/get_status/{table_number}' , [CartController::class,'get_status']);
+    Route::post('/clear/{table_number}' , [CartController::class,'clearcart']);
 
 });
 
