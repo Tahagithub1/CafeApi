@@ -78,8 +78,14 @@ class CartController extends Controller
         ]);
 
         $cartItem = CartItem::where('cart_id', $cart_id)
-                            ->where('product_id', $request->product_id)
-                            ->first();
+            ->where('product_id', $request->product_id)
+            ->first();
+        if (!$cartItem) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product does not exists in the cart',
+            ],404);
+        }
 
         if ($cartItem) {
             // Update existing item quantity
@@ -101,7 +107,8 @@ class CartController extends Controller
         ], 201);
     }
 
-    public function viewCart($cart_id) {
+    public function viewCart($cart_id)
+    {
 //
 //        if (!$cart_id) {
 //            return response()->json([
@@ -131,27 +138,28 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function viewcartorder($cart_id){
+    public function viewcartorder($cart_id)
+    {
 //        $cart = Cart::with(['items.product' => function ($query) { $query->where('status',1); }])->find($cart_id);
-          $cart = Cart::with('items.product')->find($cart_id);
-          if (!$cart) {
-              return response()->json([
-                  'success' => false,
-                  'message' => 'Cart not found',
-              ],404);
-          }elseif ($cart->status == 0){
-              return response()->json([
-                  'success' => false,
-                  'message' => 'Cart is not active',
-              ],200);
-          }else{
-              return response()->json([
-                 'success' => true,
-                 'message' => 'Cart is active',
-                 'cart' => $cart,
-              ],200);
-          }
+        $cart = Cart::with('items.product')->find($cart_id);
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found',
+            ], 404);
+        } elseif ($cart->status == 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart is not active',
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart is active',
+                'cart' => $cart,
+            ], 200);
         }
+    }
 
 
     public function increaseItemQuantity(Request $request, $cartId, $itemId)
@@ -159,10 +167,10 @@ class CartController extends Controller
         $request->validate(['quantity' => 'required|integer|min:1']);
 
         $cartItem = CartItem::where('cart_id', $cartId)
-                            ->where('id', $itemId)
-                            ->firstOrFail();
+            ->where('id', $itemId)
+            ->firstOrFail();
 
-       $cartItem->increment('quantity', $request->quantity);
+        $cartItem->increment('quantity', $request->quantity);
 
         return response()->json([
             'success' => true,
@@ -176,8 +184,8 @@ class CartController extends Controller
         $request->validate(['quantity' => 'required|integer|min:1']);
 
         $cartItem = CartItem::where('cart_id', $cartId)
-                            ->where('id', $itemId)
-                            ->firstOrFail();
+            ->where('id', $itemId)
+            ->firstOrFail();
 
         if ($cartItem->quantity > $request->quantity) {
             // Decrease item quantity
@@ -193,68 +201,58 @@ class CartController extends Controller
             'cartItem' => $cartItem
         ], 200);
     }
-//    public function completeorders(Request $request){
-//        $validated = $request->validate([
-//            'table_number' => 'required|exists:carts,table_number',
-//        ]);
-//        $cart = Cart::where('table_number', $validated['table_number'])->where('status', 0)->first();
-//        if ($cart) {
-//            $cart->status = 1;
-//            $cart->save();
-//            return response()->json([
-//                'success'=> true,
-//                'message' => 'Order completed successfully!'
-//            ],201);
-//        }else{
-//            return response()->json([
-//                'success' => false,
-//                'message' => 'Cart not found or already completed'
-//            ], 404);
-//        }
-
-//        if($Cart){
-//            // $Cart->update(['status' => 1]);
-//            // $Cart->refresh();
-//            // dd($Cart);
-//            DB::connection()->getPdo();
-//            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validat['table_number']]);
-//            return response()->json([
-//                'success'=> true,
-//                'message'=> 'order completed successfully'
-//              ],201);
-//        }else{
-//            return response()->json([
-//                'success'=> false,
-//                'message'=> 'Cart not found or already compleed'
-//            ],404);
-//        }
-
-//    }
 
     public function completeorders(Request $request)
     {
         $validated = $request->validate([
             'table_number' => 'required|exists:carts,table_number',
         ]);
-
-        $cart = Cart::where('table_number', $validated['table_number'])
-            ->where('status', 0)
-            ->first();
-        if ($cart){
-            DB::update('update carts set status = 1 where table_number = ?', [$validated['table_number']]);
+        $cart = Cart::where('table_number', $validated['table_number'])->where('status', 0)->first();
+        if ($cart) {
+            // $Cart->update(['status' => 1]);
+            // $Cart->refresh();
+            // dd($Cart);
+            DB::connection()->getPdo();
+            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validated['table_number']]);
+            return response()->json([
+                'success' => true,
+                'message' => 'order completed successfully'
+            ], 201);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found or already compleed'
+            ], 404);
         }
 
-        if (!$cart) {
-            return response()->json(['message' => 'Cart not found or already completed'], 404);
-        }
 
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Order completed successfully!',
-//            'cart' => $cart,
-        ], 201);
     }
+
+//    public function completeorders(Request $request)
+//    {
+//        $validated = $request->validate([
+//            'table_number' => 'required|exists:carts,table_number',
+//        ]);
+//
+//        $cart = Cart::where('table_number', $validated['table_number'])
+//            ->where('status', 0)
+//            ->first();
+//        if ($cart){
+//            $cart->status = 1;
+//            $cart->save();
+//            return response()->json([
+//                'success' => true,
+//                'message' => 'Order completed successfully!',
+////            'cart' => $cart,
+//            ], 201);
+//        }else{
+//            return response()->json(['message' => 'Cart not found or already completed'], 404);
+//
+//        }
+//
+//
+//    }
     public function get_status($table_number){
         $cart = Cart::where('table_number', $table_number)->with('items.product')->first();
         if ($cart) {
