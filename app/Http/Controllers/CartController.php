@@ -202,32 +202,58 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function completeorders(Request $request)
+    public function completeorders(Request $request, $tableNumber)
     {
-        $validated = $request->validate([
-            'table_number' => 'required|exists:carts,table_number',
-        ]);
-        $cart = Cart::where('table_number', $validated['table_number'])->where('status', 0)->first();
-        if ($cart) {
-            // $Cart->update(['status' => 1]);
-            // $Cart->refresh();
-            // dd($Cart);
-            DB::connection()->getPdo();
-            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validated['table_number']]);
-            return response()->json([
-                'success' => true,
-                'message' => 'order completed successfully'
-            ], 201);
-        } else {
+
+        $cart = Cart::where('table_number', $tableNumber)->first();
+        if (!$cart) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cart not found or already compleed'
+                'error' => 'Cart not found for the given table number'
             ], 404);
         }
+        if ($cart->status === 1) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart is already submitted.'
+            ], 200);
+        }
+//        $cart->update(['status' => 1]);
+        DB::connection()->getPdo();
+        DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$tableNumber]);
 
-
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart has been successfully submitted.'
+            ], 200);
 
     }
+//    public function completeorders(Request $request)
+//    {
+//        $validated = $request->validate([
+//            'table_number' => 'required|exists:carts,table_number',
+//        ]);
+//        $cart = Cart::where('table_number', $validated['table_number'])->where('status', 0)->first();
+//        if ($cart) {
+//            // $Cart->update(['status' => 1]);
+//            // $Cart->refresh();
+//            // dd($Cart);
+//            DB::connection()->getPdo();
+//            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validated['table_number']]);
+//            return response()->json([
+//                'success' => true,
+//                'message' => 'order completed successfully'
+//            ], 201);
+//        } else {
+//            return response()->json([
+//                'success' => false,
+//                'message' => 'Cart not found or already compleed'
+//            ], 404);
+//        }
+//
+//
+//
+//    }
 
 //    public function completeorders(Request $request)
 //    {
