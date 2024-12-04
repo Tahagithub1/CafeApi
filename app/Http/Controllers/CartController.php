@@ -80,12 +80,12 @@ class CartController extends Controller
         $cartItem = CartItem::where('cart_id', $cart_id)
             ->where('product_id', $request->product_id)
             ->first();
-        if (!$cartItem) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Product does not exists in the cart',
-            ],404);
-        }
+//        if (!$cartItem) {
+//            return response()->json([
+//                'success' => false,
+//                'message' => 'Product does not exists in the cart',
+//            ],404);
+//        }
 
         if ($cartItem) {
             // Update existing item quantity
