@@ -70,31 +70,43 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function addItem(Request $request, $cart_id)
+
+
+        public function addItem(Request $request, $cart_id)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1'
         ]);
 
-        $cartItem = CartItem::where('cart_id', $cart_id)
+        $cart = Cart::find($cart_id);
+
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found',
+            ], 404);
+        }
+
+        if ($cart->status !== 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Items cannot be added to a completed cart',
+            ], 400);
+        }
+
+        $cartItem = CartItem::where('cart_id', $cart->id)
             ->where('product_id', $request->product_id)
             ->first();
-//        if (!$cartItem) {
-//            return response()->json([
-//                'success' => false,
-//                'message' => 'Product does not exists in the cart',
-//            ],404);
-//        }
 
         if ($cartItem) {
-            // Update existing item quantity
+
             $cartItem->quantity += $request->quantity;
             $cartItem->save();
+
         } else {
-            // Add new item to cart
             $cartItem = CartItem::create([
-                'cart_id' => $cart_id,
+                'cart_id' => $cart->id,
                 'product_id' => $request->product_id,
                 'quantity' => $request->quantity,
             ]);
@@ -202,31 +214,46 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function completeorders(Request $request, $tableNumber)
+    public function completeorders(Request $request)
     {
+        $request->validate([
+            'cart_id' => 'required|numeric',
+        ]);
 
-        $cart = Cart::where('table_number', $tableNumber)->first();
+        $cart = Cart::find($request->cart_id);
+
         if (!$cart) {
             return response()->json([
                 'success' => false,
-                'error' => 'Cart not found for the given table number'
+                'message' => 'Cart not found',
             ], 404);
         }
-        if ($cart->status === 1) {
+
+
+        if ($cart->status == 1) {
+
             return response()->json([
-                'success' => true,
-                'message' => 'Cart is already submitted.'
-            ], 200);
+                'success' => false,
+                'message' => 'Cart is already completed',
+            ], 400);
         }
-//        $cart->update(['status' => 1]);
-        DB::connection()->getPdo();
-        DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$tableNumber]);
+
+
+        $cart->status = 1;
+        $cart->save();
+
+
+        $newCart = Cart::create([
+            'table_number' => $cart->table_number,
+            'status' => 0,
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Cart has been successfully submitted.'
-            ], 200);
-
+            'message' => 'Cart completed successfully and new cart created',
+            'completed_cart' => $cart,
+            'new_cart' => $newCart,
+        ], 200);
     }
 //    public function completeorders(Request $request)
 //    {
