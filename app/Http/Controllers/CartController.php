@@ -72,7 +72,7 @@ class CartController extends Controller
 
 
 
-        public function addItem(Request $request, $cart_id)
+    public function addItem(Request $request, $cart_id)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -212,13 +212,10 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function completeorders(Request $request)
+    public function completeorders(Request $request , $cart_id)
     {
-        $request->validate([
-            'cart_id' => 'required|numeric',
-        ]);
 
-        $cart = Cart::find($request->cart_id);
+        $cart = Cart::find($cart_id);
 
         if (!$cart) {
             return response()->json([
@@ -309,15 +306,15 @@ class CartController extends Controller
                 'success' => true,
                 'status' => $cart->status,
                 'order' => $cart,
-                ],200);
+            ],200);
         }else{
             return response()->json([
                 'success' => false,
                 'message' => 'Order not found for this table_number.'
-        ],404);
+            ],404);
+        }
     }
-}
-public function clearcart($table_number){
+    public function clearcart($table_number){
         $cart = Cart::where('table_number', $table_number)->first();
         if ($cart) {
             $cart->items()->delete();
@@ -332,20 +329,20 @@ public function clearcart($table_number){
                 'message' => 'Cart not found for this table_number.'
             ],404);
         }
-}
+    }
 
 
-public function removeItem($cartId, $itemId)
-{
-    $cartItem = CartItem::where('cart_id', $cartId)
-                        ->where('id', $itemId)
-                        ->firstOrFail();
+    public function removeItem($cartId, $itemId)
+    {
+        $cartItem = CartItem::where('cart_id', $cartId)
+            ->where('id', $itemId)
+            ->firstOrFail();
 
-    $cartItem->delete();
+        $cartItem->delete();
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Item removed from cart successfully'
-    ], 200);
-}
+        return response()->json([
+            'success' => true,
+            'message' => 'Item removed from cart successfully'
+        ], 200);
+    }
 }
