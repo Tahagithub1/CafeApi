@@ -214,13 +214,10 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function completeorders(Request $request)
+    public function completeorders(Request $request , $cart_id)
     {
-        $request->validate([
-            'cart_id' => 'required|numeric',
-        ]);
 
-        $cart = Cart::find($request->cart_id);
+        $cart = Cart::find($cart_id);
 
         if (!$cart) {
             return response()->json([
