@@ -377,21 +377,24 @@ class CartController extends Controller
         ],404);
     }
 }
-public function clearcart($table_number){
-        $cart = Cart::where('table_number', $table_number)->first();
-        if ($cart) {
-            $cart->items()->delete();
-            $cart->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Cart has been cleared successfully!',
-            ],200);
-        }else{
-            return response()->json([
-                'success' => false,
-                'message' => 'Cart not found for this table_number.'
-            ],404);
-        }
+public function deletecart($table_number){
+    $cart = Cart::find($table_number);
+
+    if (!$cart) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cart not found',
+        ], 404);
+    }
+
+//    $cart->status = 2;
+//    $cart->save();
+    $cart->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Cart cancelled successfully',
+    ]);
 }
 
 

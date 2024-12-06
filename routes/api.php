@@ -34,12 +34,15 @@ Route::prefix('/carts')->group(function () {
     Route::get('/{cart}/viewcartorder' , [CartController::class,'viewcartorder'])->name('cart.viewcartorder');
 //    Route::delete('/{id}/reset_storage', [ResetController::class, 'Delete']);
     Route::get('/get_status/{table_number}' , [CartController::class,'get_status']);
-    Route::post('/clear/{table_number}' , [CartController::class,'clearcart']);
+//    Route::post('/clear/{table_number}' , [CartController::class,'clearcart']);
 
     Route::get('/table-token/{table_number}', [CartController::class, 'getCartToken']);
     Route::post('/items', [CartController::class, 'addItem']);
     Route::post('/createOrRetrieveCart', [CartController::class, 'createOrRetrieveCart']);
     Route::post('/{toke}/completeorders', [CartController::class,'completeorders'])->name('cart.completeorders');
+    Route::delete('/deletecart/{table_number}' , [CartController::class,'deletecart']);
+
+
 
 
 
