@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+
 
 
 class CartController extends Controller
@@ -21,20 +21,16 @@ class CartController extends Controller
             $request->validate([
                 'table_number' => 'required|numeric|min:1',
             ]);
-            $token = Str::uuid()->toString();
 
             $cart = Cart::create([
                 'table_number' => $request->input('table_number'),
-                'token' => $token
             ]);
-
 
             return response()->json([
                 'success' => true,
                 'message' => 'Cart created successfully',
                 'id' => $cart->id,
-                'data' => $cart,
-                'token' => $token
+                'data' => $cart
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -44,24 +40,6 @@ class CartController extends Controller
             ], 500);
         }
     }
-    public function getCartToken($table_number)
-    {
-        $cart = Cart::where('table_number', $table_number)->first();
-
-        if ($cart) {
-            return response()->json([
-                'success' => true,
-                'table_number' => $table_number,
-                'token' => $cart->token
-            ]);
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'table_number not found'
-        ], 404);
-    }
-
 
     public function search(Request $request)
     {
@@ -92,21 +70,29 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function addItem(Request $request)
+
+
+        public function addItem(Request $request, $cart_id)
     {
         $request->validate([
-            'token' => 'required|string',
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:1'
         ]);
 
-        $cart = Cart::where('token', $request->token)->first();
+        $cart = Cart::find($cart_id);
 
         if (!$cart) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cart not found or token invalid',
+                'message' => 'Cart not found',
             ], 404);
+        }
+
+        if ($cart->status !== 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Items cannot be added to a completed cart',
+            ], 400);
         }
 
         $cartItem = CartItem::where('cart_id', $cart->id)
@@ -114,8 +100,10 @@ class CartController extends Controller
             ->first();
 
         if ($cartItem) {
+
             $cartItem->quantity += $request->quantity;
             $cartItem->save();
+
         } else {
             $cartItem = CartItem::create([
                 'cart_id' => $cart->id,
@@ -127,43 +115,7 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Item added to cart successfully',
-            'item' => $cartItem,
-        ], 201);
-    }
-    public function createOrRetrieveCart(Request $request)
-    {
-        $request->validate([
-            'table_number' => 'required|numeric|min:1',
-        ]);
-
-        $tableNumber = $request->input('table_number');
-
-        $cart = Cart::where('table_number', $tableNumber)
-            ->where('status', 0)
-            ->first();
-
-        if ($cart) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Cart already exists',
-                'token' => $cart->token,
-                'data' => $cart,
-            ], 200);
-        }
-
-
-        $token = Str::uuid()->toString();
-        $newCart = Cart::create([
-            'table_number' => $tableNumber,
-            'token' => $token,
-            'status' => 0,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Cart created successfully',
-            'token' => $token,
-            'data' => $newCart,
+            'item' => $cartItem
         ], 201);
     }
 
@@ -196,9 +148,7 @@ class CartController extends Controller
             'cart' => $cart,
             'total_price' => $totalPrice,
         ], 200);
-    }
-
-    public function viewcartorder($cart_id)
+    }public function viewcartorder($cart_id)
     {
 //        $cart = Cart::with(['items.product' => function ($query) { $query->where('status',1); }])->find($cart_id);
         $cart = Cart::with('items.product')->find($cart_id);
@@ -262,55 +212,47 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function completeorders($token)
+    public function completeorders(Request $request)
     {
-        $cart = Cart::where('token', $token)
-            ->where('status', 0)
-            ->first();
+        $request->validate([
+            'cart_id' => 'required|numeric',
+        ]);
+
+        $cart = Cart::find($request->cart_id);
 
         if (!$cart) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cart not found or already completed',
+                'message' => 'Cart not found',
             ], 404);
         }
 
-        // تغییر وضعیت به completed
+
+        if ($cart->status == 1) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart is already completed',
+            ], 400);
+        }
+
+
         $cart->status = 1;
         $cart->save();
 
+
+        $newCart = Cart::create([
+            'table_number' => $cart->table_number,
+            'status' => 0,
+        ]);
+
         return response()->json([
             'success' => true,
-            'message' => 'Cart completed successfully',
-            'data' => $cart,
+            'message' => 'Cart completed successfully and new cart created',
+            'completed_cart' => $cart,
+            'new_cart' => $newCart,
         ], 200);
     }
-//    public function completeorders(Request $request, $tableNumber)
-//    {
-//
-//        $cart = Cart::where('table_number', $tableNumber)->first();
-//        if (!$cart) {
-//            return response()->json([
-//                'success' => false,
-//                'error' => 'Cart not found for the given table number'
-//            ], 404);
-//        }
-//        if ($cart->status === 1) {
-//            return response()->json([
-//                'success' => true,
-//                'message' => 'Cart is already submitted.'
-//            ], 200);
-//        }
-////        $cart->update(['status' => 1]);
-//        DB::connection()->getPdo();
-//        DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$tableNumber]);
-//
-//        return response()->json([
-//            'success' => true,
-//            'message' => 'Cart has been successfully submitted.'
-//            ], 200);
-//
-//    }
 //    public function completeorders(Request $request)
 //    {
 //        $validated = $request->validate([
@@ -322,7 +264,7 @@ class CartController extends Controller
 //            // $Cart->refresh();
 //            // dd($Cart);
 //            DB::connection()->getPdo();
-//            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validated['table_number']]);
+//            DB::update('UPDATE carts SET status= 1 WHERE table_number = ? AND status = 0', [$validated['table_number']]);
 //            return response()->json([
 //                'success' => true,
 //                'message' => 'order completed successfully'
@@ -336,9 +278,7 @@ class CartController extends Controller
 //
 //
 //
-//    }
-
-//    public function completeorders(Request $request)
+//    }//    public function completeorders(Request $request)
 //    {
 //        $validated = $request->validate([
 //            'table_number' => 'required|exists:carts,table_number',
@@ -377,24 +317,21 @@ class CartController extends Controller
         ],404);
     }
 }
-public function deletecart($table_number){
-    $cart = Cart::find($table_number);
-
-    if (!$cart) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Cart not found',
-        ], 404);
-    }
-
-//    $cart->status = 2;
-//    $cart->save();
-    $cart->delete();
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Cart cancelled successfully',
-    ]);
+public function clearcart($table_number){
+        $cart = Cart::where('table_number', $table_number)->first();
+        if ($cart) {
+            $cart->items()->delete();
+            $cart->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart has been cleared successfully!',
+            ],200);
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found for this table_number.'
+            ],404);
+        }
 }
 
 
