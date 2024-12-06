@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('table_number');
             $table->boolean('status')->default(false)->nullable();
+            $table->string('token')->unique();
             $table->timestamps();
         });
     }
