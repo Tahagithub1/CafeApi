@@ -16,9 +16,11 @@ class CartManager extends Component
 
     public function removeCart($cartId)
     {
-        Cart::find($cartId)->delete();
-        $table_number = $cartId;
-        $this->dispatch('cart-removed', ['table_number' => $table_number]);
+     $table_number =   Cart::find($cartId);
+        Cart::where('table_number' , $cartId)->delete();
+//        Cart::where('table_number', $cartId)->delete();
+//        $table_number = $cartId;
+//        $this->dispatch('cart-removed', ['table_number' => $table_number]);
         $this->carts = Cart::with('items.product')->get();
     }
 

@@ -214,15 +214,16 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function completeorders(Request $request , $cart_id)
+    public function completeorders(Request $request , $table_number)
     {
 
-        $cart = Cart::find($cart_id);
+//        Log::info('kir' . $cart_id);
+        $cart = Cart::where('table_number', $table_number)->where('status', 0)->first();
 
         if (!$cart) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cart not found',
+                'message' => 'Cart not found or not active',
             ], 404);
         }
 
@@ -239,11 +240,15 @@ class CartController extends Controller
         $cart->status = 1;
         $cart->save();
 
+        $newCart =Cart::where('table_number', $table_number)->where('status', 0)->first();
 
-        $newCart = Cart::create([
-            'table_number' => $cart->table_number,
-            'status' => 0,
-        ]);
+         if (!$newCart) {
+             $newCart = Cart::create([
+                 'table_number' => $table_number,
+                 'status' => 0,
+             ]);
+         }
+
 
         return response()->json([
             'success' => true,
@@ -263,7 +268,7 @@ class CartController extends Controller
 //            // $Cart->refresh();
 //            // dd($Cart);
 //            DB::connection()->getPdo();
-//            DB::update('UPDATE `carts` SET `status`= 1 WHERE table_number = ? AND status = 0', [$validated['table_number']]);
+//            DB::update('UPDATE carts SET status= 1 WHERE table_number = ? AND status = 0', [$validated['table_number']]);
 //            return response()->json([
 //                'success' => true,
 //                'message' => 'order completed successfully'
@@ -277,9 +282,7 @@ class CartController extends Controller
 //
 //
 //
-//    }
-
-//    public function completeorders(Request $request)
+//    }//    public function completeorders(Request $request)
 //    {
 //        $validated = $request->validate([
 //            'table_number' => 'required|exists:carts,table_number',
@@ -319,7 +322,7 @@ class CartController extends Controller
         }
     }
     public function clearcart($table_number){
-        $cart = Cart::where('table_number', $table_number)->first();
+        $cart = Cart::where('table_number', $table_number)->where('status',0)->first();
         if ($cart) {
             $cart->items()->delete();
             $cart->delete();

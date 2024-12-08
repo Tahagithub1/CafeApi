@@ -14,7 +14,7 @@
                                 Status: <span class="text-green-500 font-semibold">Completed</span>
                         </p>
                         <button
-                            wire:click="removeCart({{ $cart->id }})"
+                            wire:click="removeCart({{ $cart->table_number }})"
                             class="
                                    text-white px-3 py-1 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md">
                             🗑 Remove All
