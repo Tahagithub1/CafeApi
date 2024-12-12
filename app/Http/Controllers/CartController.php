@@ -217,8 +217,8 @@ class CartController extends Controller
     public function completeorders(Request $request , $table_number)
     {
 
-//        Log::info('kir' . $cart_id);
-        $cart = Cart::where('table_number', $table_number)->where('status', 0)->first();
+//        Log::info('bad request' . $cart_id);
+        $cart = Cart::where('table_number', $table_number)->where('status', 0)->orderBy('id', 'desc')->first();
 
         if (!$cart) {
             return response()->json([
@@ -306,6 +306,22 @@ class CartController extends Controller
 //
 //
 //    }
+public function getnewCart(Request $request, $table_number)
+{
+    $cart = Cart::where('table_number', $table_number)->where('status', 1)->orderBy('id', 'desc')->first();
+    if (!$cart) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cart_New not found',
+        ],404);
+    }else{
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart_New found',
+            'cart' => $cart,
+        ],201);
+    }
+}
     public function get_status($table_number){
         $cart = Cart::where('table_number', $table_number)->with('items.product')->first();
         if ($cart) {
