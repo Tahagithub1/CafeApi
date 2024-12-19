@@ -308,7 +308,7 @@ class CartController extends Controller
 //    }
 public function getnewCart(Request $request, $table_number)
 {
-    $cart = Cart::with('items')->where('table_number', $table_number)->where('status', 1)->orderBy('id', 'desc')->first();
+    $cart = Cart::with('items.product')->where('table_number', $table_number)->where('status', 1)->orderBy('id', 'desc')->first();
     if (!$cart) {
         return response()->json([
             'success' => false,
